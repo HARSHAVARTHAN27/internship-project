@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PlaceIQ — Admin Panel</title>
+<link rel="stylesheet" href="css/style.css" />
+  <style>
+    .add-form-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:1.25rem; margin-bottom:1rem; }
+    .add-form-grid2 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:1.25rem; margin-bottom:1rem; }
+    .stats-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:1.5rem; margin-bottom:1.5rem; }
+    .stat-box { background:var(--bg-card); backdrop-filter:blur(24px); border:1px solid var(--border-light); border-radius:var(--radius-sm); padding:1.25rem; text-align:center; transition:transform 0.2s, box-shadow 0.2s; position:relative; overflow:hidden; }
+    .stat-box::before { content:''; position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent,rgba(255,255,255,0.15),transparent); }
+    .stat-box:hover { transform:translateY(-3px); box-shadow:0 10px 25px rgba(0,0,0,0.4); border-color:rgba(255,255,255,0.2); background:var(--bg-card-hover); }
+    .stat-box-val { font-family:var(--font-display); font-size:32px; font-weight:800; color:var(--text-main); line-height:1; }
+    .stat-box-lbl { font-size:12px; font-weight:600; color:var(--text-muted); margin-top:8px; text-transform:uppercase; letter-spacing:0.1em; }
+    .records-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:1.5rem; flex-wrap:wrap; gap:1rem; }
+    .remove-btn { padding:6px 16px; border-radius:20px; border:1px solid rgba(239,68,68,0.3); background:rgba(239,68,68,0.1); color:#f87171; font-size:12px; font-weight:700; cursor:pointer; font-family:var(--font-body); transition:all 0.2s; }
+    .remove-btn:hover { background:rgba(239,68,68,0.2); border-color:#f87171; transform:translateY(-1px); }
+    @media(max-width:1024px){ .add-form-grid,.add-form-grid2,.stats-grid{ grid-template-columns:1fr 1fr; } }
+    @media(max-width:768px){ .add-form-grid,.add-form-grid2,.stats-grid{ grid-template-columns:1fr; } }
+  </style>
+  <script src="js/theme.js"></script>
+</head>
+<body>
+<div class="bg-orb orb-1"></div>
+<div class="bg-orb orb-2"></div>
+<div class="bg-orb orb-3"></div>
+<nav class="nav">
+  <a class="nav-brand" href="index.html">
+    <div class="nav-logo">P</div>
+    <span class="nav-title">PlaceIQ</span>
+  </a>
+  <div class="nav-links">
+    <a class="nav-link" href="student.html">Student</a>
+    <a class="nav-link" href="tpo.html">TPO</a>
+    <a class="nav-link active" href="admin.html">Admin</a>
+  </div>
+  <div class="nav-avatar">A</div>
+</nav>
+
+<div class="page">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Admin Panel</div>
+      <div class="page-sub">Manage students, upload datasets and run ML predictions</div>
+    </div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-box"><div class="stat-box-val" id="statTotal">0</div><div class="stat-box-lbl">Total Students</div></div>
+    <div class="stat-box"><div class="stat-box-val" id="statAdded">0</div><div class="stat-box-lbl">Manually Added</div></div>
+    <div class="stat-box"><div class="stat-box-val" id="statDatasets">0</div><div class="stat-box-lbl">CSV Uploads</div></div>
+    <div class="stat-box"><div class="stat-box-val" id="statAtRisk" style="color:#FF6B6B;">0</div><div class="stat-box-lbl">At Risk</div></div>
+    <div class="stat-box"><div class="stat-box-val" id="statHigh" style="color:#00D4AA;">0</div><div class="stat-box-lbl">High Chance</div></div>
+  </div>
+
+  <div class="section-card">
+    <div class="section-title">➕ Add Student Manually</div>
+    <div class="add-form-grid">
+      <div class="form-group"><label class="form-label">Student Name</label><input class="form-input" id="inputName" type="text" placeholder="Enter name" /></div>
+      <div class="form-group"><label class="form-label">Email</label><input class="form-input" id="inputEmail" type="email" placeholder="student@gmail.com" /></div>
+      <div class="form-group"><label class="form-label">Department</label><select class="form-select" id="inputDept"><option value="">Select Department</option><option value="CSE">CSE</option><option value="ECE">ECE</option><option value="ME">ME</option><option value="CE">CE</option></select></div>
+    </div>
+    <div class="add-form-grid2">
+      <div class="form-group"><label class="form-label">CGPA (0–10)</label><input class="form-input" id="inputCgpa" type="number" min="0" max="10" step="0.1" placeholder="e.g. 8.5" /></div>
+      <div class="form-group"><label class="form-label">Attendance (%)</label><input class="form-input" id="inputAttendance" type="number" min="0" max="100" placeholder="e.g. 85" /></div>
+      <div class="form-group"><label class="form-label">Resume Score (0–100)</label><input class="form-input" id="inputResumeScore" type="number" min="0" max="100" placeholder="e.g. 75" /></div>
+    </div>
+    <div style="margin-bottom:1rem;">
+      <button class="btn btn-primary" onclick="addStudent()" style="width:100%;justify-content:center;">🤖 Add & Predict</button>
+    </div>
+    <div id="addResult" style="display:none; margin-top:1.5rem; padding:1.25rem 1.5rem; border-radius:var(--radius-sm); border:1px solid rgba(255,255,255,0.1); background:var(--bg-glass);">
+      <div style="font-size:13px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:10px;">AI Prediction Result</div>
+      <div id="addResultContent"></div>
+    </div>
+  </div>
+
+  <div class="section-card">
+    <div class="section-title">📂 Upload Dataset (CSV)</div>
+    <div class="upload-zone">
+      <input type="file" id="csvFile" accept=".csv" onchange="handleUpload(event)" />
+      <div class="upload-icon">📁</div>
+      <div style="font-size:14px; font-weight:600; color:var(--text2);">Click or Drop CSV File Here</div>
+      <small style="color:var(--text3);">Required columns: name, dept, cgpa, attendance, resumeScore</small>
+    </div>
+    <div id="predictionResults" style="margin-top:20px;"></div>
+  </div>
+
+  <div class="section-card">
+    <div class="records-header">
+      <div class="section-title" style="margin-bottom:0;">📋 Student Records &nbsp;<span style="font-size:12px;font-weight:500;color:var(--text3);" id="recordCount"></span></div>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+        <button class="export-btn" onclick="exportCSV()">⬇ Export CSV</button>
+        <div class="filter-pills">
+          <button class="pill-btn active" onclick="applyFilter('all',this)">All</button>
+          <button class="pill-btn" onclick="applyFilter('CSE',this)">CSE</button>
+          <button class="pill-btn" onclick="applyFilter('ECE',this)">ECE</button>
+          <button class="pill-btn" onclick="applyFilter('ME',this)">ME</button>
+          <button class="pill-btn" onclick="applyFilter('CE',this)">CE</button>
+        </div>
+        <div class="search-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="adminSearch" placeholder="Search student..." oninput="applySearch()" />
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:1rem;">
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr><th>#</th><th>Name</th><th>Dept</th><th>CGPA</th><th>Attendance</th><th>Resume Score</th><th>Placement Chance</th><th>AI Prediction</th><th>Status</th><th>Action</th></tr></thead>
+          <tbody id="recordsTbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>

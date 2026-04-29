@@ -1,0 +1,1258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>PlaceIQ — Premium Profile</title>
+<link rel="stylesheet" href="css/style.css"/>
+<script src="js/theme.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<style>
+  :root {
+    --primary: #6366f1;
+    --primary-light: rgba(99,102,241,0.15);
+    --secondary: #ec4899;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --bg-dark: #050505;
+    --surface: rgba(20, 20, 25, 0.6);
+    --surface-border: rgba(255, 255, 255, 0.08);
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --font-sans: 'Plus Jakarta Sans', sans-serif;
+    --font-heading: 'Outfit', sans-serif;
+  }
+  
+  [data-theme="light"] {
+    --bg-dark: var(--bg);
+    --surface: var(--bg-2);
+    --surface-border: var(--border);
+    --text-primary: var(--text-1);
+    --text-secondary: var(--text-2);
+    --primary-light: rgba(99,102,241,0.1);
+  }
+
+  body {
+    background-color: var(--bg-dark);
+    font-family: var(--font-sans);
+    color: var(--text-primary);
+    overflow-x: hidden;
+    margin: 0;
+  }
+
+  /* Professional Enterprise Background */
+  .premium-bg { position: fixed; inset: 0; z-index: -1; background-color: var(--bg-dark); background-image: radial-gradient(circle at 15% 50%, rgba(99, 102, 241, 0.05), transparent 40%), radial-gradient(circle at 85% 30%, rgba(99, 102, 241, 0.03), transparent 40%); transition: background-color 0.3s; }
+  .p-grid { position: absolute; inset: 0; background-image: linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px); background-size: 32px 32px; mask-image: linear-gradient(to bottom, black 20%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, black 20%, transparent 100%); pointer-events: none; }
+  [data-theme="light"] .p-grid { background-image: linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px); }
+
+  /* Navigation overrides for premium feel */
+  .nav {
+    background: var(--nav-bg, rgba(10, 10, 12, 0.8)) !important;
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--surface-border);
+    font-family: var(--font-sans);
+  }
+  .nav-title { font-family: var(--font-heading) !important; }
+
+  /* Premium Bento Grid Layout */
+  .profile-container {
+    max-width: 1350px;
+    margin: 2rem auto;
+    padding: 0 2rem;
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: 1.5rem;
+  }
+
+  .bento-card {
+    background: var(--surface);
+    backdrop-filter: blur(16px);
+    border: 1px solid var(--surface-border);
+    border-radius: 24px;
+    padding: 2rem;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s;
+  }
+  .bento-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.1);
+  }
+
+  /* Sidebar Styles */
+  .profile-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .avatar-container {
+    text-align: center;
+    position: relative;
+  }
+  .big-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 30%;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    margin: 0 auto 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+    font-family: var(--font-heading);
+    font-weight: 800;
+    color: white;
+    box-shadow: 0 10px 30px rgba(99,102,241,0.4);
+    border: 2px solid rgba(255,255,255,0.1);
+    transform: rotate(-5deg);
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .bento-card:hover .big-avatar {
+    transform: rotate(0deg) scale(1.05);
+  }
+
+  .profile-name {
+    font-family: var(--font-heading);
+    font-size: 28px;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(to right, #fff, #94a3b8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .profile-role {
+    display: inline-block;
+    padding: 6px 16px;
+    background: var(--primary-light);
+    color: #a5b4fc;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    border: 1px solid rgba(99,102,241,0.3);
+  }
+
+  /* Progress Ring */
+  .completion-ring {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 2rem 0;
+    position: relative;
+  }
+  .completion-ring svg { transform: rotate(-90deg); }
+  .ring-bg { fill: none; stroke: rgba(255,255,255,0.05); stroke-width: 10; }
+  .ring-fill {
+    fill: none;
+    stroke: url(#gradient);
+    stroke-width: 10;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .ring-content {
+    position: absolute;
+    text-align: center;
+  }
+  .ring-pct { font-family: var(--font-heading); font-size: 32px; font-weight: 800; line-height: 1; }
+  .ring-lbl { font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
+
+  /* Info List */
+  .info-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .info-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: rgba(255,255,255,0.02);
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,0.05);
+    transition: background 0.2s;
+  }
+  .info-item:hover { background: rgba(255,255,255,0.05); }
+  .info-icon {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.05);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-secondary);
+  }
+  .info-data .lbl { font-size: 11px; color: var(--text-secondary); font-weight: 600; text-transform: uppercase; margin-bottom: 2px; }
+  .info-data .val { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+
+  /* Skills Tags */
+  .skills-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 1rem;
+  }
+  .skill-tag {
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    backdrop-filter: blur(4px);
+    transition: all 0.2s;
+  }
+  .tag-blue { background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.2); color: #818cf8; }
+  .tag-green { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.2); color: #34d399; }
+  .tag-pink { background: rgba(236,72,153,0.1); border: 1px solid rgba(236,72,153,0.2); color: #f472b6; }
+  .tag-amber { background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.2); color: #fbbf24; }
+  .skill-tag:hover { transform: translateY(-2px); filter: brightness(1.2); }
+
+  /* Main Content Area */
+  .main-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  /* Stats Grid */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+  }
+  .stat-card {
+    background: linear-gradient(145deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%);
+    border: 1px solid var(--surface-border);
+    border-radius: 20px;
+    padding: 1.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 2px;
+  }
+  .stat-card.c1::before { background: linear-gradient(90deg, #6366f1, #8b5cf6); }
+  .stat-card.c2::before { background: linear-gradient(90deg, #10b981, #34d399); }
+  .stat-card.c3::before { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+  .stat-card.c4::before { background: linear-gradient(90deg, #ec4899, #f472b6); }
+
+  .stat-val {
+    font-family: var(--font-heading);
+    font-size: 32px;
+    font-weight: 800;
+    margin-bottom: 4px;
+    color: var(--text-primary);
+  }
+  .stat-lbl {
+    font-size: 12px;
+    color: var(--text-secondary);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .stat-badge {
+    position: absolute;
+    top: 1rem; right: 1rem;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  /* Progress Bars Section */
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+  }
+  .section-title {
+    font-family: var(--font-heading);
+    font-size: 20px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .icon-box {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .icon-box.blue { background: rgba(99,102,241,0.15); color: #818cf8; }
+  .icon-box.green { background: rgba(16,185,129,0.15); color: #34d399; }
+  .icon-box.pink { background: rgba(236,72,153,0.15); color: #f472b6; }
+
+  .progress-group { display: flex; flex-direction: column; gap: 1.25rem; }
+  .progress-item .meta {
+    display: flex; justify-content: space-between;
+    font-size: 13px; font-weight: 600;
+    margin-bottom: 8px; color: var(--text-primary);
+  }
+  .progress-track {
+    height: 8px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 1.5s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* Edit Profile Form */
+  .edit-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+  .form-group {
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .form-label {
+    font-size: 12px; font-weight: 700; color: var(--text-secondary);
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .form-input {
+    background: rgba(0,0,0,0.2);
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 14px 16px;
+    border-radius: 12px;
+    font-family: var(--font-sans);
+    font-size: 14px; color: white;
+    transition: all 0.3s;
+    outline: none;
+  }
+  .form-input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(99,102,241,0.15);
+    background: rgba(0,0,0,0.4);
+  }
+  .form-input[readonly] { opacity: 0.6; cursor: not-allowed; }
+  
+  .view-value {
+    font-size: 15px; font-weight: 600;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+
+  .btn {
+    padding: 10px 24px;
+    border-radius: 12px;
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: none;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white;
+    box-shadow: 0 4px 15px rgba(99,102,241,0.3);
+  }
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(99,102,241,0.4);
+  }
+  .btn-outline {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.1);
+    color: var(--text-primary);
+  }
+  .btn-outline:hover {
+    background: rgba(255,255,255,0.05);
+    border-color: rgba(255,255,255,0.2);
+  }
+  .btn-pw {
+    width: 100%;
+    justify-content: center;
+    background: rgba(236,72,153,0.1);
+    color: #f472b6;
+    border: 1px solid rgba(236,72,153,0.2);
+    margin-top: 1.5rem;
+  }
+  .btn-pw:hover { background: rgba(236,72,153,0.2); transform: translateY(-2px); }
+
+  /* Achievements */
+  .achievements-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 20px;
+  }
+  .achievement-card {
+    background: linear-gradient(145deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 20px;
+    padding: 24px 20px;
+    text-align: center;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    overflow: hidden;
+  }
+  .achievement-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 50%; transform: translateX(-50%);
+    width: 80%; height: 60%;
+    background: radial-gradient(circle, rgba(251,191,36,0.15) 0%, transparent 70%);
+    opacity: 0; transition: opacity 0.4s;
+    pointer-events: none;
+  }
+  .achievement-card:not(.locked)::before {
+    opacity: 1;
+  }
+  .achievement-card:not(.locked) {
+    border-color: rgba(251,191,36,0.4);
+    box-shadow: 0 8px 32px rgba(245,158,11,0.1), inset 0 0 0 1px rgba(251,191,36,0.1);
+  }
+  .achievement-card:not(.locked):hover {
+    transform: translateY(-6px) scale(1.02);
+    border-color: rgba(251,191,36,0.6);
+    box-shadow: 0 12px 40px rgba(245,158,11,0.2), inset 0 0 0 1px rgba(251,191,36,0.3);
+  }
+
+  .ach-icon-wrap {
+    width: 64px; height: 64px;
+    margin: 0 auto 16px;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.2);
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+    z-index: 1;
+  }
+  .achievement-card:not(.locked) .ach-icon-wrap {
+    background: linear-gradient(135deg, rgba(251,191,36,0.25), rgba(245,158,11,0.15));
+    border: 2px solid rgba(251,191,36,0.5);
+    box-shadow: 0 0 20px rgba(251,191,36,0.4);
+  }
+  
+  .ach-icon {
+    font-size: 32px;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+  }
+  .ach-title { font-family: var(--font-heading); font-size: 15px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; z-index: 1; position: relative; }
+  .ach-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.4; z-index: 1; position: relative; }
+
+  /* Locked styling */
+  .achievement-card.locked {
+    background: rgba(0,0,0,0.1);
+    border: 1px dashed rgba(255,255,255,0.1);
+    opacity: 0.7;
+    filter: grayscale(1);
+  }
+  .achievement-card.locked .ach-icon-wrap {
+    opacity: 0.5;
+  }
+
+  @media(max-width: 1100px) {
+    .profile-container { grid-template-columns: 1fr; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media(max-width: 600px) {
+    .achievements-grid { grid-template-columns: 1fr; }
+    .edit-grid { grid-template-columns: 1fr; }
+  }
+  .aca-dashboard {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .chance-spotlight {
+    background: linear-gradient(135deg, rgba(236, 72, 153, 0.08) 0%, rgba(99, 102, 241, 0.04) 100%);
+    border: 1px solid rgba(236, 72, 153, 0.15);
+    border-radius: 20px;
+    padding: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+  }
+  [data-theme="light"] .chance-spotlight {
+    background: linear-gradient(135deg, rgba(236, 72, 153, 0.05) 0%, rgba(99, 102, 241, 0.02) 100%);
+    border-color: rgba(236, 72, 153, 0.15);
+  }
+  .chance-spotlight::before {
+    content: '';
+    position: absolute;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: radial-gradient(circle at center, rgba(236,72,153,0.15) 0%, transparent 60%);
+    pointer-events: none;
+    animation: slowRotate 15s linear infinite;
+  }
+  @keyframes slowRotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  .spotlight-info { z-index: 1; }
+  .spotlight-info h3 {
+    margin: 0 0 8px 0;
+    font-family: var(--font-heading);
+    font-size: 24px;
+    font-weight: 700;
+    color: #f472b6;
+  }
+  [data-theme="light"] .spotlight-info h3 { color: #db2777; }
+  .spotlight-info p {
+    margin: 0;
+    font-size: 14px;
+    color: var(--text-secondary);
+    max-width: 320px;
+    line-height: 1.5;
+  }
+  .spotlight-ring {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+  }
+  .spotlight-val {
+    position: absolute;
+    font-family: var(--font-heading);
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--text-primary);
+  }
+  .spotlight-svg {
+    width: 100%; height: 100%;
+    transform: rotate(-90deg);
+    filter: drop-shadow(0 0 12px rgba(236,72,153,0.4));
+  }
+
+  .aca-metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  .metric-glass {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: transform 0.3s, background 0.3s;
+  }
+  [data-theme="light"] .metric-glass {
+    background: rgba(0, 0, 0, 0.02);
+    border-color: rgba(0, 0, 0, 0.05);
+  }
+  .metric-glass:hover {
+    transform: translateY(-4px);
+    background: rgba(255, 255, 255, 0.04);
+  }
+  [data-theme="light"] .metric-glass:hover { background: rgba(0, 0, 0, 0.04); }
+  .mg-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .mg-icon {
+    width: 40px; height: 40px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .c-blue .mg-icon { background: rgba(99,102,241,0.15); color: #818cf8; }
+  .c-green .mg-icon { background: rgba(16,185,129,0.15); color: #34d399; }
+  .c-amber .mg-icon { background: rgba(245,158,11,0.15); color: #fbbf24; }
+  [data-theme="light"] .c-blue .mg-icon { color: #4f46e5; }
+  [data-theme="light"] .c-green .mg-icon { color: #059669; }
+  [data-theme="light"] .c-amber .mg-icon { color: #d97706; }
+  
+  .mg-val {
+    font-family: var(--font-heading);
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--text-primary);
+  }
+  .mg-lbl {
+    font-size: 13px;
+    color: var(--text-secondary);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .mg-bar-wrap {
+    width: 100%;
+    height: 6px;
+    background: rgba(0,0,0,0.2);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-top: 4px;
+  }
+  [data-theme="light"] .mg-bar-wrap { background: rgba(0,0,0,0.05); }
+  .mg-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .c-blue .mg-fill { background: linear-gradient(90deg, #6366f1, #818cf8); box-shadow: 0 0 10px rgba(99,102,241,0.5); }
+  .c-green .mg-fill { background: linear-gradient(90deg, #10b981, #34d399); box-shadow: 0 0 10px rgba(16,185,129,0.5); }
+  .c-amber .mg-fill { background: linear-gradient(90deg, #f59e0b, #fbbf24); box-shadow: 0 0 10px rgba(245,158,11,0.5); }
+
+  @media(max-width: 768px) {
+    .aca-metrics-grid { grid-template-columns: 1fr; }
+    .chance-spotlight { flex-direction: column; text-align: center; gap: 20px; }
+    .spotlight-info p { margin: 0 auto; }
+  }
+
+  [data-theme="light"] .info-item { background: rgba(0,0,0,0.02); border-color: rgba(0,0,0,0.05); }
+  [data-theme="light"] .info-item:hover { background: rgba(0,0,0,0.05); }
+  [data-theme="light"] .info-icon { background: rgba(0,0,0,0.05); }
+  [data-theme="light"] .stat-card { background: linear-gradient(145deg, rgba(0,0,0,0.02) 0%, rgba(0,0,0,0.01) 100%); }
+  [data-theme="light"] .progress-track { background: rgba(0,0,0,0.05); }
+  [data-theme="light"] .form-input { background: rgba(0,0,0,0.02); border-color: rgba(0,0,0,0.1); color: var(--text-primary); }
+  [data-theme="light"] .form-input:focus { background: rgba(0,0,0,0.05); }
+  [data-theme="light"] .view-value { border-color: rgba(0,0,0,0.05); }
+  [data-theme="light"] .btn-outline { border-color: rgba(0,0,0,0.1); }
+  [data-theme="light"] .btn-outline:hover { background: rgba(0,0,0,0.05); border-color: rgba(0,0,0,0.15); }
+  [data-theme="light"] .achievement-card { background: rgba(0,0,0,0.02); border-color: rgba(0,0,0,0.05); }
+  [data-theme="light"] .achievement-card:hover { background: rgba(0,0,0,0.05); border-color: rgba(0,0,0,0.1); }
+  [data-theme="light"] .profile-name { background: none; color: var(--text-primary); -webkit-text-fill-color: initial; }
+
+  @keyframes popCelebrate {
+    0% { transform: scale(1); }
+    40% { transform: scale(1.15) rotate(3deg); background: rgba(251,191,36,0.15); border-color: rgba(251,191,36,0.6); }
+    60% { transform: scale(1.15) rotate(-3deg); }
+    80% { transform: scale(1.05) rotate(0deg); }
+    100% { transform: scale(1); }
+  }
+  .pop-celebration {
+    animation: popCelebrate 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    box-shadow: 0 0 25px rgba(251,191,36,0.5) !important;
+  }
+</style>
+</head>
+<body>
+
+<!-- Professional Enterprise Background -->
+<div class="premium-bg">
+  <div class="p-grid"></div>
+</div>
+
+<nav class="nav">
+  <a class="nav-brand" href="login.html">
+    <div class="nav-logo">P</div>
+    <span class="nav-title">PlaceIQ</span>
+  </a>
+  <div class="nav-links">
+    <a class="nav-link" href="student.html">
+      <i data-lucide="layout-dashboard" style="width:16px;height:16px;margin-right:6px;vertical-align:middle;"></i>
+      Dashboard
+    </a>
+    <a class="nav-link active" href="profile.html">
+      <!-- NEW ICON AS REQUESTED -->
+      <i data-lucide="circle-user-round" style="width:16px;height:16px;margin-right:6px;vertical-align:middle;"></i>
+      My Profile
+    </a>
+  </div>
+  <div class="nav-avatar" id="navAvatar">?</div>
+</nav>
+
+<div class="profile-container">
+  
+  <!-- LEFT SIDEBAR -->
+  <div class="profile-sidebar">
+    <div class="bento-card" style="text-align: center;">
+      <div class="avatar-container">
+        <div class="big-avatar" id="bigAvatar">?</div>
+      </div>
+      <div class="profile-name" id="sName">Loading...</div>
+      <div class="profile-role" id="sRole">Student</div>
+
+      <!-- Completion Ring -->
+      <div class="completion-ring">
+        <svg width="140" height="140" viewBox="0 0 140 140">
+          <defs>
+            <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#6366f1" />
+              <stop offset="100%" stop-color="#ec4899" />
+            </linearGradient>
+          </defs>
+          <circle class="ring-bg" cx="70" cy="70" r="60" />
+          <circle class="ring-fill" id="ringFill" cx="70" cy="70" r="60" stroke-dasharray="377" stroke-dashoffset="377" />
+        </svg>
+        <div class="ring-content">
+          <div class="ring-pct" id="ringPct">0%</div>
+          <div class="ring-lbl">Profile</div>
+        </div>
+      </div>
+
+      <!-- Info List -->
+      <div class="info-list" style="text-align: left;">
+        <div class="info-item">
+          <div class="info-icon"><i data-lucide="mail" style="width:18px;"></i></div>
+          <div class="info-data">
+            <div class="lbl">Email Address</div>
+            <div class="val" id="sEmail">—</div>
+          </div>
+        </div>
+        <div class="info-item">
+          <div class="info-icon"><i data-lucide="building-2" style="width:18px;"></i></div>
+          <div class="info-data">
+            <div class="lbl">Department</div>
+            <div class="val" id="sDept">—</div>
+          </div>
+        </div>
+        <div class="info-item">
+          <div class="info-icon"><i data-lucide="id-card" style="width:18px;"></i></div>
+          <div class="info-data">
+            <div class="lbl">Roll Number</div>
+            <div class="val" id="sRoll">—</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top: 1.5rem; text-align: left;">
+        <div style="font-size:11px; font-weight:700; color:var(--text-secondary); text-transform:uppercase; letter-spacing:1px;">Skill Tags</div>
+        <div class="skills-wrapper" id="skillTags"></div>
+      </div>
+
+      <button class="btn btn-pw" onclick="openSettings()">
+        <i data-lucide="lock-keyhole" style="width:16px;"></i> Change Password
+      </button>
+    </div>
+  </div>
+
+  <!-- RIGHT MAIN CONTENT -->
+  <div class="main-content">
+    
+    <!-- Stats Grid -->
+    <div class="bento-card">
+      <div class="section-header">
+        <div class="section-title">
+          <div class="icon-box blue"><i data-lucide="bar-chart-3"></i></div>
+          Academic Overview
+        </div>
+        <button class="btn btn-outline" id="toggleAcaBtn" onclick="toggleAcaEdit()">
+          <i data-lucide="pencil" style="width:14px;"></i> Edit
+        </button>
+      </div>
+      
+      <div id="viewAcaDiv">
+      <div class="aca-dashboard">
+        <div class="chance-spotlight">
+          <div class="spotlight-info">
+            <h3>Placement Probability</h3>
+            <p>Based on your current academic velocity, resume strength, and attendance record.</p>
+            <div class="stat-badge tag-pink" id="chanceBadge" style="margin-top:12px; display:inline-flex; position:static;"></div>
+          </div>
+          <div class="spotlight-ring">
+            <svg class="spotlight-svg" viewBox="0 0 120 120">
+              <circle cx="60" cy="60" r="54" fill="none" stroke="rgba(236,72,153,0.1)" stroke-width="8"></circle>
+              <circle id="pfChanceRing" cx="60" cy="60" r="54" fill="none" stroke="url(#pgGradChance)" stroke-width="8" stroke-dasharray="339.29" stroke-dashoffset="339.29" stroke-linecap="round" style="transition:stroke-dashoffset 1.5s cubic-bezier(0.4, 0, 0.2, 1)"></circle>
+              <defs>
+                <linearGradient id="pgGradChance" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#ec4899"/>
+                  <stop offset="100%" stop-color="#db2777"/>
+                </linearGradient>
+              </defs>
+            </svg>
+            <div class="spotlight-val" id="mChance">—</div>
+            <!-- Keep hidden for compat -->
+            <div style="display:none;"><span id="pgChance"></span><div id="pfChance"></div></div>
+          </div>
+        </div>
+
+        <div class="aca-metrics-grid">
+          <!-- CGPA -->
+          <div class="metric-glass c-blue">
+            <div class="mg-header">
+              <div class="mg-icon"><i data-lucide="graduation-cap"></i></div>
+              <div class="stat-badge tag-blue" id="cgpaBadge" style="position:static;"></div>
+            </div>
+            <div class="mg-info">
+              <span class="mg-lbl">CGPA Score</span>
+              <span class="mg-val" id="mCgpa">—</span>
+            </div>
+            <div class="mg-bar-wrap"><div class="mg-fill" id="pfCgpa" style="width:0;"></div></div>
+            <div style="display:none;"><span id="pgCgpa"></span></div>
+          </div>
+          <!-- Attendance -->
+          <div class="metric-glass c-green">
+            <div class="mg-header">
+              <div class="mg-icon"><i data-lucide="calendar-check"></i></div>
+              <div class="stat-badge tag-green" id="attBadge" style="position:static;"></div>
+            </div>
+            <div class="mg-info">
+              <span class="mg-lbl">Attendance</span>
+              <span class="mg-val" id="mAtt">—</span>
+            </div>
+            <div class="mg-bar-wrap"><div class="mg-fill" id="pfAtt" style="width:0;"></div></div>
+            <div style="display:none;"><span id="pgAtt"></span></div>
+          </div>
+          <!-- Resume -->
+          <div class="metric-glass c-amber">
+            <div class="mg-header">
+              <div class="mg-icon"><i data-lucide="file-text"></i></div>
+              <div class="stat-badge tag-amber" id="resBadge" style="position:static;"></div>
+            </div>
+            <div class="mg-info">
+              <span class="mg-lbl">Resume Strength</span>
+              <span class="mg-val" id="mRes">—</span>
+            </div>
+            <div class="mg-bar-wrap"><div class="mg-fill" id="pfRes" style="width:0;"></div></div>
+            <div style="display:none;"><span id="pgRes"></span></div>
+          </div>
+        </div>
+      </div>
+      </div>
+
+      <!-- Edit Mode for Academic Overview -->
+      <div id="editAcaDiv" style="display:none;">
+        <div class="edit-grid">
+          <div class="form-group">
+            <label class="form-label">CGPA (out of 10)</label>
+            <input class="form-input" id="eCgpa" type="number" step="0.01" min="0" max="10" placeholder="e.g. 8.5"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Attendance (%)</label>
+            <input class="form-input" id="eAtt" type="number" step="0.1" min="0" max="100" placeholder="e.g. 85.5"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Resume Score</label>
+            <input class="form-input" id="eRes" type="number" step="1" min="0" max="100" placeholder="e.g. 75"/>
+          </div>
+        </div>
+        <div id="editAcaAlert" style="font-size:13px; font-weight:600; min-height:18px; margin: 12px 0;"></div>
+        <div style="display:flex; gap:12px; margin-top: 1rem;">
+          <button class="btn btn-primary" onclick="saveAca()">
+            <i data-lucide="save" style="width:16px;"></i> Save Changes
+          </button>
+          <button class="btn btn-outline" onclick="cancelAcaEdit()">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit Profile Section -->
+    <div class="bento-card">
+      <div class="section-header">
+        <div class="section-title">
+          <div class="icon-box green"><i data-lucide="user-pen"></i></div>
+          Personal Details
+        </div>
+        <button class="btn btn-outline" id="toggleBtn" onclick="toggleEdit()">
+          <i data-lucide="pencil" style="width:14px;"></i> Edit
+        </button>
+      </div>
+
+      <!-- View Mode -->
+      <div id="viewDiv">
+        <div class="edit-grid">
+          <div class="form-group">
+            <div class="form-label">Full Name</div>
+            <div class="view-value" id="vName">—</div>
+          </div>
+          <div class="form-group">
+            <div class="form-label">Roll Number</div>
+            <div class="view-value" id="vRoll">—</div>
+          </div>
+          <div class="form-group">
+            <div class="form-label">Department</div>
+            <div class="view-value" id="vDept">—</div>
+          </div>
+          <div class="form-group">
+            <div class="form-label">Email Address</div>
+            <div class="view-value" id="vEmail">—</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Edit Mode -->
+      <div id="editDiv" style="display:none;">
+        <div class="edit-grid">
+          <div class="form-group">
+            <label class="form-label">Full Name</label>
+            <input class="form-input" id="eName" type="text" placeholder="Enter full name"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Roll Number</label>
+            <input class="form-input" id="eRoll" type="text" placeholder="Enter roll number"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Department</label>
+            <select class="form-input" id="eDept">
+              <option value="CSE">Computer Science</option>
+              <option value="ECE">Electronics</option>
+              <option value="ME">Mechanical</option>
+              <option value="CE">Civil</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email (Read Only)</label>
+            <input class="form-input" id="eEmail" type="text" readonly/>
+          </div>
+        </div>
+        
+        <div id="editAlert" style="font-size:13px; font-weight:600; min-height:18px; margin: 12px 0;"></div>
+        
+        <div style="display:flex; gap:12px; margin-top: 1rem;">
+          <button class="btn btn-primary" onclick="saveProfile()">
+            <i data-lucide="save" style="width:16px;"></i> Save Changes
+          </button>
+          <button class="btn btn-outline" onclick="cancelEdit()">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Achievements Section -->
+    <div class="bento-card">
+      <div class="section-header">
+        <div class="section-title">
+          <div class="icon-box pink"><i data-lucide="award"></i></div>
+          Achievements & Badges
+        </div>
+      </div>
+      <div class="achievements-grid" id="achGrid">
+        <!-- Injected via JS -->
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<!-- Scripts -->
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script>
+// Initialize Lucide Icons
+lucide.createIcons();
+
+const API='http://127.0.0.1:5000/api';
+let user=null, sd=null;
+
+function showToast(m, c='#34d399') {
+  const t = document.getElementById('toast');
+  t.textContent = m;
+  t.style.borderColor = c + '44';
+  t.style.background = `linear-gradient(to right, rgba(20,20,25,0.95), ${c}22)`;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function setBadge(id, label, cls) {
+  const el = document.getElementById(id);
+  el.textContent = label;
+  el.className = 'stat-badge ' + cls;
+}
+
+function setBar(pfId, pgId, val, display) {
+  document.getElementById(pgId).textContent = display;
+  setTimeout(() => { document.getElementById(pfId).style.width = val + '%'; }, 300);
+}
+
+function setRing(pct) {
+  const circumference = 377; // 2 * pi * 60
+  const offset = circumference - (pct / 100) * circumference;
+  setTimeout(() => {
+    document.getElementById('ringFill').style.strokeDashoffset = offset;
+    document.getElementById('ringPct').textContent = pct + '%';
+  }, 300);
+}
+
+let prevAchs = null;
+
+function renderAchievements(cgpa, att, res, chance) {
+  const achs = [
+    { id: 'ach1', e:'🎯', n:'Placement Ready', d:'Chance ≥ 70%', ok: chance >= 70 },
+    { id: 'ach2', e:'📚', n:'Academic Star', d:'CGPA ≥ 8.5', ok: cgpa >= 8.5 },
+    { id: 'ach3', e:'✅', n:'Attendance Pro', d:'Attendance ≥ 90%', ok: att >= 90 },
+    { id: 'ach4', e:'📄', n:'Resume Expert', d:'Resume Score ≥ 80', ok: res >= 80 },
+    { id: 'ach5', e:'🏅', n:'All-Rounder', d:'All metrics good', ok: cgpa >= 7 && att >= 80 && res >= 70 },
+    { id: 'ach6', e:'🚀', n:'Top Performer', d:'CGPA ≥ 9.0', ok: cgpa >= 9.0 },
+  ];
+  
+  // Detect newly unlocked achievements
+  let newlyUnlocked = [];
+  if (prevAchs) {
+    achs.forEach(a => {
+      if (a.ok && !prevAchs[a.id]) {
+        newlyUnlocked.push(a);
+      }
+    });
+  }
+  
+  // Save current state for next comparison
+  prevAchs = {};
+  achs.forEach(a => prevAchs[a.id] = a.ok);
+
+  document.getElementById('achGrid').innerHTML = achs.map(a => `
+    <div id="card_${a.id}" class="achievement-card ${a.ok ? '' : 'locked'}">
+      <div class="ach-icon-wrap"><div class="ach-icon">${a.e}</div></div>
+      <div class="ach-title">${a.n}</div>
+      <div class="ach-desc">${a.d}</div>
+    </div>`).join('');
+    
+  // Trigger celebrations if any new achievement unlocked
+  if (newlyUnlocked.length > 0) {
+    // Fire confetti!
+    const duration = 2500;
+    const animationEnd = Date.now() + duration;
+    const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 9999 };
+
+    function randomInRange(min, max) {
+      return Math.random() * (max - min) + min;
+    }
+
+    const interval = setInterval(function() {
+      const timeLeft = animationEnd - Date.now();
+      if (timeLeft <= 0) { return clearInterval(interval); }
+      const particleCount = 40 * (timeLeft / duration);
+      confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+      confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+    }, 250);
+    
+    // Add pop-celebration class to the cards
+    newlyUnlocked.forEach(a => {
+      const card = document.getElementById('card_' + a.id);
+      if(card) {
+        card.classList.add('pop-celebration');
+        // Remove class after animation finishes to reset state
+        setTimeout(() => { card.classList.remove('pop-celebration'); }, 1500);
+      }
+    });
+  }
+}
+
+function renderSkillTags(dept, cgpa, att, res) {
+  const tags = [];
+  if(cgpa >= 8) tags.push({ l:'High CGPA', c:'tag-blue' });
+  if(att >= 80) tags.push({ l:'Regular Attendance', c:'tag-green' });
+  if(res >= 75) tags.push({ l:'Strong Resume', c:'tag-pink' });
+  tags.push({ l: dept, c:'tag-amber' });
+  if(cgpa >= 7.5 && att >= 75) tags.push({ l:'Placement Eligible', c:'tag-blue' });
+  document.getElementById('skillTags').innerHTML = tags.map(t => `<span class="skill-tag ${t.c}">${t.l}</span>`).join('');
+}
+
+async function initProfile() {
+  user = requireLogin(['Student', 'Admin']);
+  if(!user) return;
+  injectLogoutButton();
+
+  document.getElementById('navAvatar').textContent = user.name[0].toUpperCase();
+  document.getElementById('bigAvatar').textContent = user.name[0].toUpperCase();
+  document.getElementById('sName').textContent = user.name;
+  document.getElementById('sRole').textContent = user.role;
+  document.getElementById('sEmail').textContent = user.email;
+  document.getElementById('sDept').textContent = user.dept || 'N/A';
+  document.getElementById('sRoll').textContent = user.roll || 'N/A';
+
+  document.getElementById('vName').textContent = user.name;
+  document.getElementById('vRoll').textContent = user.roll || 'N/A';
+  document.getElementById('vDept').textContent = user.dept || 'N/A';
+  document.getElementById('vEmail').textContent = user.email;
+
+  try {
+    const r = await fetch(`${API}/students`);
+    const all = await r.json();
+    sd = all.find(s => (s.email && s.email.toLowerCase() === user.email.toLowerCase()) || (s.roll && s.roll === user.roll) || s.name.toLowerCase() === user.name.toLowerCase());
+  } catch(e) {}
+
+  const cgpa = parseFloat(sd?.cgpa || user.cgpa || 0);
+  const att = parseFloat(sd?.attendance || user.attendance || 0);
+  const res = parseFloat(sd?.resumeScore || user.resumeScore || 0);
+  const chance = parseFloat(sd?.placementChance || 0);
+
+  // Counter animation for numbers
+  animateValue('mCgpa', 0, cgpa, 1000, true);
+  animateValue('mAtt', 0, att, 1000, false, '%');
+  animateValue('mRes', 0, res, 1000, false);
+  animateValue('mChance', 0, chance, 1000, false, '%');
+
+  setBadge('cgpaBadge', cgpa >= 8 ? 'Excellent' : cgpa >= 7 ? 'Good' : 'Low', cgpa >= 8 ? 'tag-green' : cgpa >= 7 ? 'tag-amber' : 'tag-pink');
+  setBadge('attBadge', att >= 80 ? 'Good' : 'Low 80%', att >= 80 ? 'tag-green' : 'tag-pink');
+  setBadge('resBadge', res >= 75 ? 'Strong' : 'Moderate', res >= 75 ? 'tag-green' : 'tag-amber');
+  setBadge('chanceBadge', chance >= 70 ? 'High' : 'Moderate', chance >= 70 ? 'tag-green' : 'tag-amber');
+
+  setBar('pfCgpa', 'pgCgpa', cgpa * 10, cgpa.toFixed(2) + ' / 10');
+  setBar('pfAtt', 'pgAtt', att, att + '%');
+  setBar('pfRes', 'pgRes', res, res + ' / 100');
+  setBar('pfChance', 'pgChance', chance, chance + '%');
+  
+  if (document.getElementById('pfChanceRing')) {
+    const chanceOffset = 339.29 - (chance / 100) * 339.29;
+    setTimeout(() => { document.getElementById('pfChanceRing').style.strokeDashoffset = chanceOffset; }, 300);
+  }
+
+  let score = 0;
+  if(user.name) score += 25;
+  if(user.email) score += 25;
+  if(user.dept && user.dept !== 'N/A') score += 20;
+  if(user.roll && user.roll !== 'N/A') score += 15;
+  if(cgpa > 0) score += 15;
+  setRing(score);
+
+  renderSkillTags(user.dept || 'CSE', cgpa, att, res);
+  renderAchievements(cgpa, att, res, chance);
+}
+
+function animateValue(id, start, end, duration, isFloat=false, suffix='') {
+  if (start === end) return;
+  const obj = document.getElementById(id);
+  let startTimestamp = null;
+  const step = (timestamp) => {
+    if (!startTimestamp) startTimestamp = timestamp;
+    const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+    const current = progress * (end - start) + start;
+    obj.innerHTML = (isFloat ? current.toFixed(1) : Math.floor(current)) + suffix;
+    if (progress < 1) {
+      window.requestAnimationFrame(step);
+    }
+  };
+  window.requestAnimationFrame(step);
+}
+
+function toggleEdit() {
+  document.getElementById('viewDiv').style.display = 'none';
+  document.getElementById('editDiv').style.display = 'block';
+  document.getElementById('toggleBtn').style.display = 'none';
+  document.getElementById('eName').value = user.name;
+  document.getElementById('eRoll').value = user.roll || '';
+  document.getElementById('eDept').value = user.dept || 'CSE';
+  document.getElementById('eEmail').value = user.email;
+}
+
+function cancelEdit() {
+  document.getElementById('editDiv').style.display = 'none';
+  document.getElementById('viewDiv').style.display = 'block';
+  document.getElementById('toggleBtn').style.display = '';
+  document.getElementById('editAlert').textContent = '';
+}
+
+async function saveProfile() {
+  const n = document.getElementById('eName').value.trim();
+  const r = document.getElementById('eRoll').value.trim();
+  const d = document.getElementById('eDept').value;
+  const al = document.getElementById('editAlert');
+  if(!n) { al.textContent = 'Name is required'; al.style.color = '#f87171'; return; }
+  
+  const oldBtn = event.currentTarget.innerHTML;
+  event.currentTarget.innerHTML = 'Saving...';
+  
+  try {
+    const res = await fetch(`${API}/update-profile`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: user.email,
+        roll: r,
+        dept: d,
+        cgpa: user.cgpa || 0,
+        attendance: user.attendance || 0,
+        resumeScore: user.resumeScore || 0
+      })
+    });
+    const data = await res.json();
+    if(res.ok) {
+      user.name = n; user.roll = r; user.dept = d;
+      localStorage.setItem('placeiq_user', JSON.stringify(user));
+      
+      document.getElementById('vName').textContent = n;
+      document.getElementById('vRoll').textContent = r || 'N/A';
+      document.getElementById('vDept').textContent = d;
+      document.getElementById('sName').textContent = n;
+      document.getElementById('sDept').textContent = d;
+      document.getElementById('sRoll').textContent = r || 'N/A';
+      document.getElementById('bigAvatar').textContent = n[0].toUpperCase();
+      document.getElementById('navAvatar').textContent = n[0].toUpperCase();
+      
+      cancelEdit();
+      showToast('✓ Profile updated successfully!');
+      initProfile();
+    } else {
+      al.textContent = data.error || 'Failed to update';
+      al.style.color = '#f87171';
+    }
+  } catch(e) {
+    al.textContent = 'Network error';
+    al.style.color = '#f87171';
+  }
+  event.currentTarget.innerHTML = oldBtn;
+}
+
+function toggleAcaEdit() {
+  document.getElementById('viewAcaDiv').style.display = 'none';
+  document.getElementById('editAcaDiv').style.display = 'block';
+  document.getElementById('toggleAcaBtn').style.display = 'none';
+  
+  const cgpa = parseFloat(sd?.cgpa || user.cgpa || 0);
+  const att = parseFloat(sd?.attendance || user.attendance || 0);
+  const res = parseFloat(sd?.resumeScore || user.resumeScore || 0);
+  
+  document.getElementById('eCgpa').value = cgpa;
+  document.getElementById('eAtt').value = att;
+  document.getElementById('eRes').value = res;
+}
+
+function cancelAcaEdit() {
+  document.getElementById('editAcaDiv').style.display = 'none';
+  document.getElementById('viewAcaDiv').style.display = 'block';
+  document.getElementById('toggleAcaBtn').style.display = '';
+  document.getElementById('editAcaAlert').textContent = '';
+}
+
+async function saveAca() {
+  const c = parseFloat(document.getElementById('eCgpa').value) || 0;
+  const a = parseFloat(document.getElementById('eAtt').value) || 0;
+  const r = parseFloat(document.getElementById('eRes').value) || 0;
+  const al = document.getElementById('editAcaAlert');
+  
+  if (c < 0 || c > 10) { al.textContent = 'CGPA must be between 0 and 10'; al.style.color = '#f87171'; return; }
+  if (a < 0 || a > 100) { al.textContent = 'Attendance must be between 0 and 100'; al.style.color = '#f87171'; return; }
+  if (r < 0 || r > 100) { al.textContent = 'Resume score must be between 0 and 100'; al.style.color = '#f87171'; return; }
+  
+  const oldBtn = event.currentTarget.innerHTML;
+  event.currentTarget.innerHTML = 'Saving...';
+  
+  try {
+    const res = await fetch(`${API}/update-profile`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: user.email,
+        roll: user.roll || '',
+        dept: user.dept || 'CSE',
+        cgpa: c,
+        attendance: a,
+        resumeScore: r
+      })
+    });
+    const data = await res.json();
+    if(res.ok) {
+      user.cgpa = c;
+      user.attendance = a;
+      user.resumeScore = r;
+      user.placementChance = data.placementChance || 0;
+      localStorage.setItem('placeiq_user', JSON.stringify(user));
+      cancelAcaEdit();
+      showToast('✓ Academic Overview updated!');
+      initProfile();
+    } else {
+      al.textContent = data.error || 'Failed to update';
+      al.style.color = '#f87171';
+    }
+  } catch(e) {
+    al.textContent = 'Network error';
+    al.style.color = '#f87171';
+  }
+  event.currentTarget.innerHTML = oldBtn;
+}
+
+initProfile();
+</script>
+</body>
+</html>

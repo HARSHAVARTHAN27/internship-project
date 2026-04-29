@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PlaceIQ — TPO Dashboard</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+  <style>
+    .tpo-stats  { display: grid; grid-template-columns: repeat(4,1fr); gap: 1.5rem; margin-bottom: 2rem; }
+    .toolbar    { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+    .forecast-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 1.5rem; margin-bottom: 2rem; }
+    .section-title { font-family: var(--font-display); font-size: 18px; font-weight: 800; margin-bottom: 1.25rem; color: var(--text-main); letter-spacing: -0.01em; }
+    @media(max-width:1024px){ .tpo-stats,.forecast-grid{grid-template-columns:1fr 1fr;} }
+    @media(max-width:768px){ .tpo-stats,.forecast-grid{grid-template-columns:1fr;} }
+  </style>
+  <script src="js/theme.js"></script>
+</head>
+<body>
+<div class="bg-orb orb-1"></div>
+<div class="bg-orb orb-2"></div>
+<div class="bg-orb orb-3"></div>
+
+<nav class="nav">
+  <a class="nav-brand" href="index.html">
+    <div class="nav-logo">P</div>
+    <span class="nav-title">PlaceIQ</span>
+  </a>
+  <div class="nav-links">
+    <a class="nav-link" href="student.html">Student</a>
+    <a class="nav-link active" href="tpo.html">TPO</a>
+    <a class="nav-link" href="admin.html">Admin</a>
+  </div>
+  <div class="nav-avatar">T</div>
+</nav>
+
+<div class="page">
+  <div class="page-header">
+    <div>
+      <div class="page-title">TPO Dashboard</div>
+      <div class="page-sub">Monitor all students' placement readiness and department performance</div>
+    </div>
+    <button class="export-btn" onclick="exportCSV()">⬇ Export Report</button>
+  </div>
+
+  <div class="tpo-stats">
+    <div class="stat-tile"><div class="stat-label">Total Students</div><div class="stat-value" id="statTotal">—</div><div class="stat-badge badge-purple">All Departments</div></div>
+    <div class="stat-tile"><div class="stat-label">Avg Placement %</div><div class="stat-value" id="statAvg">—</div><div class="stat-badge badge-green">Overall average</div></div>
+    <div class="stat-tile"><div class="stat-label">At Risk (&lt;40%)</div><div class="stat-value" id="statRisk">—</div><div class="stat-badge badge-red">Needs attention</div></div>
+    <div class="stat-tile"><div class="stat-label">High Performers</div><div class="stat-value" id="statHigh">—</div><div class="stat-badge badge-amber">&gt;80% placement</div></div>
+  </div>
+
+  <div class="toolbar">
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" placeholder="Search student name…" id="searchInput" oninput="filterTable()" />
+    </div>
+    <div class="filter-pills" id="deptFilters">
+      <button class="pill-btn active" data-dept="All" onclick="filterDept(this)">All</button>
+      <button class="pill-btn" data-dept="CSE" onclick="filterDept(this)">CSE</button>
+      <button class="pill-btn" data-dept="ECE" onclick="filterDept(this)">ECE</button>
+      <button class="pill-btn" data-dept="ME"  onclick="filterDept(this)">ME</button>
+      <button class="pill-btn" data-dept="CE"  onclick="filterDept(this)">CE</button>
+    </div>
+  </div>
+
+  <div class="tbl-wrap mb-15">
+    <table class="tbl">
+      <thead>
+        <tr><th>#</th><th>Name</th><th>Department</th><th>CGPA</th><th>Attendance</th><th>Resume Score</th><th>Placement %</th><th>AI Prediction</th><th>Status</th></tr>
+      </thead>
+      <tbody id="tpoBody"></tbody>
+    </table>
+  </div>
+
+  <div class="section-title">Department Placement Forecast</div>
+  <div class="forecast-grid" id="forecastGrid"></div>
+
+  <div class="chart-card">
+    <div class="chart-title">Department Placement Forecast — Comparison</div>
+    <div class="chart-sub">Average placement % per department</div>
+    <div style="position:relative;height:260px;"><canvas id="forecastChart"></canvas></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/tpo.js"></script>
+</body>
+</html>

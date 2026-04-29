@@ -1,0 +1,8 @@
+name,roll,email,dept,cgpa,attendance,resumeScore,password_hash,role
+Arslan,15,arslanmaazo7@gmail.com,CSE,7.5,80.0,75.0,0be7018dbc14560c39dff0e1a4b74eb095403cdbde11d4206c0952da51792f64,Student
+Maaz,21CSE001,arsmaaz2407@gmail.com,CSE,8.5,85.0,75.0,ded4ed622cb31af7c370725a9dda537206944910224bed298ec2752f05b804a1,Student
+John,21CSE001,john@sit.edu,CSE,8.5,85.0,75.0,b4b597c714a8f49103da4dab0266af0ee0ae4f8575250a84855c3d76941cd422,Student
+Krugna,ADM-01,admin@krugna.edu,N/A,0.0,0.0,0.0,689fd273f15d05d309b59b36301fcc04f11364b55c3ce97b521450958336c598,Admin
+demo.student,N/A,demo.student@gmail.com,N/A,0,0,0,,Student
+demo,N/A,demo@gmail.com,N/A,0,0,0,,Student
+Harshavarthan s,N/A,harshavarthan.s27@gmail.com,N/A,0,0,0,,Student
